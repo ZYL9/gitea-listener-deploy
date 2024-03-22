@@ -4,10 +4,15 @@
 
 ## 来由
 需求分析一下其实就是究极简化版的cicd，网上搜了下，铺天盖地的Jenkins教程
+
 但是Jenkins实在太耗内存，便宜虚机性能不行跑起来巨卡无比，查到的同类方案基本都是类似情况。
+
 原本计划使用gitea action，由于网络的原因，本机部署的测试环境github action上的项目基本都拉不下来
+
 加上action本身就是容器起的，action运行的时候就是容器套容器，操作起来非常的晦涩，有几个点满足不了要求，研究了一下午无果
+
 加上本身需求比较简单，死磕action实在不划算
+
 于是研究了一下webhook，起一个http server，捕获gitea传的webhook后，用脚本操作docker就行
 ## 项目地址
 还没建，有空再说吧
@@ -25,8 +30,11 @@ ALLOWED_HOST_LIST = *
 ```
 
 新建项目后，项目的设置界面找一下`Web钩子`
+
 添加一个`gitea`的钩子
+
 目标url：`http://listener:3001/webhook`
+
 其他都不用动，可以点测试推送试一下能不能用
 
 # 实现
@@ -36,7 +44,9 @@ ALLOWED_HOST_LIST = *
 3. 不依赖第三方库
 
 首先排除python(划掉)，不造轮子的话，最简单的http server都需要第三方库支撑，太复杂了
+
 Java和c#都是太大太笨了，还需要jre或者runtime
+
 rust和c++其实是优选，但是可惜都不太会
 
 思考一下最后选了golang，可以不调用任何三方库，原生编译，也挺简单的
@@ -44,7 +54,9 @@ rust和c++其实是优选，但是可惜都不太会
 
 ## 实现
 把需求丢到gpt里，就能拿到模板了，主要就几个部分
+
 下面贴上关键代码，尽量省略错误处理
+
 golang的错误处理实在是有点难受
 
 1. http server捕获post请求
@@ -155,7 +167,7 @@ docker run -d --name "$1" -p 40030:80 "$2"
 ```
 顺便补充下go.mod
 因为用的全部都是原生库，其实贴不贴没啥影响
-```
+```go.mod
 module auto-deploy/listener
 
 go 1.22.1
@@ -262,12 +274,14 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### todo
 现在自动起的端口都是写死的`40030:80`，不太能满足后续变化，应该在程序里加一个判断，根据`repo-description`或者其他字段里的内容对端口映射进行调整。
+
 但是现在这个主要是我自己的前端页面需要自动更新，暂时没有需求，就犯懒了。
 
 ## 坑
 ### 容器内操作docker失效
 用普通alpine挂载sock后，映射/usr/bin/docker不行
-还是需要装一个docker-cli
+
+还是需要装一个docker-cli。
 最简单的话，用`alpinelinux/docker-cli`做底，加一个git就好
 
 ### wsl出现各种诡异问题
