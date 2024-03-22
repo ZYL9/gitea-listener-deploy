@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  gitea:
+    image: gitea/gitea:1.21.7
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    networks:
+      gitea_network:
+        aliases:
+          - gitea
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/.ssh/:/data/git/.ssh
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+
+  listener:
+    image: zy/listener
+    build: ./listener-alpine
+    container_name: listener
+    restart: always
+    networks:
+      gitea_network:
+        aliases:
+          - listener
+    volumes:
+      - ./listener-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 3001
+
+networks:
+  gitea_network:
+    name: gitea_network
+    driver: bridge
+    external: false
