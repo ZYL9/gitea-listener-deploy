@@ -17,6 +17,9 @@
 ## 项目地址
 还没建，有空再说吧
 
+补一下
+https://github.com/ZYL9/gitea-listener-deploy
+
 # tldr
 使用以下命令启动
 ```bash
@@ -278,6 +281,8 @@ CMD ["nginx", "-g", "daemon off;"]
 但是现在这个主要是我自己的前端页面需要自动更新，暂时没有需求，就犯懒了。
 
 ## 坑
+这个地方主要是我自己技术菜的问题，不一定是真的坑，看个乐呵就得了
+
 ### 容器内操作docker失效
 用普通alpine挂载sock后，映射/usr/bin/docker不行
 
